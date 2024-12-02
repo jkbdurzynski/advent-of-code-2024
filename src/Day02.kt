@@ -1,34 +1,28 @@
-import kotlin.math.abs
-
 fun main() {
 
-    fun isRowSafe(row: List<Long>, shouldDescend: Boolean) = row.windowed(2).all { (a, b) ->
-        val increment = abs(a - b)
-        increment in 1..3 && if (shouldDescend) a > b else a < b
-    }
+    fun isReportSafe(row: List<Long>) = row.windowed(2)
+        .let { windows ->
+            val shouldDescend = row[0] > row[1]
+            windows.all { (a, b) ->
+                if (shouldDescend) {
+                    a - b in 1..3
+                } else {
+                    a - b in -3..-1
+                }
+            }
+        }
 
     fun part1(input: List<String>): Int = input
-        .map { it.split("\\s+".toRegex()).map(String::toLong) }
-        .count { row ->
-            val shouldDescend = row[0] > row[1]
-            isRowSafe(row, shouldDescend)
-        }
+        .map { it.split("""\s+""".toRegex()).map(String::toLong) }
+        .count { isReportSafe(it) }
 
     fun part2(input: List<String>): Int = input
         .map { it.split("\\s+".toRegex()).map(String::toLong) }
         .count { row ->
-            val shouldDescend = row[0] > row[1]
-            isRowSafe(row, shouldDescend) || row.indices.asSequence()
-                .map { skipIndex ->
-                    row.filterIndexed { index, _ -> index != skipIndex }
-                }.any {
-                    isRowSafe(it, it[0] > it[1])
-                }
+            row.indices.asSequence()
+                .map { removeIndex -> row.toMutableList().apply { removeAt(removeIndex) } }
+                .any { isReportSafe(it) }
         }
-
-
-//    val testInput = readInput("Day01_test")
-//    check(part1(testInput) == 1L)
 
     val input = readInput("Day02")
     part1(input).println()

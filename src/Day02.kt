@@ -1,3 +1,5 @@
+import kotlin.system.measureTimeMillis
+
 fun main() {
 
     fun isReportSafe(row: List<Long>) = row.windowed(2)
@@ -25,6 +27,6 @@ fun main() {
         }
 
     val input = readInput("Day02")
-    part1(input).println()
-    part2(input).println()
+    measureTimeMillis { part1(input).println() }.also { println("part1 = $it") }
+    measureTimeMillis { part2(input).println() }.also { println("part2 = $it") }
 }

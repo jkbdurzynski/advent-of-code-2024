@@ -18,19 +18,12 @@ fun main() {
         .map { it.split("\\s+".toRegex()).map(String::toLong) }
         .count { row ->
             val shouldDescend = row[0] > row[1]
-            val safe = isRowSafe(row, shouldDescend)
-
-            if (!safe) {
-                row.indices.map { skipIndex ->
+            isRowSafe(row, shouldDescend) || row.indices.asSequence()
+                .map { skipIndex ->
                     row.filterIndexed { index, _ -> index != skipIndex }
                 }.any {
                     isRowSafe(it, it[0] > it[1])
-                }.also {
-                    println("$row = $it")
                 }
-            } else {
-                true
-            }
         }
 
 

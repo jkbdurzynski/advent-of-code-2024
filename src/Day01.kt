@@ -1,21 +1,19 @@
 import kotlin.math.abs
 
 fun main() {
-    fun part1(input: List<String>): Long = input.map {
+    fun readToPairs(input: List<String>) = input.map {
         val first = it.substringBefore(" ").toLong()
         val second = it.substringAfterLast(" ").toLong()
         first to second
-    }.unzip()
+    }
+
+    fun part1(input: List<String>): Long = readToPairs(input).unzip()
         .let { (left, right) ->
             left.sorted().zip(right.sorted())
                 .sumOf { (leftItem, rightItem) -> abs(leftItem - rightItem) }
         }
 
-    fun part2(input: List<String>): Long = input.map {
-        val first = it.substringBefore(" ").toLong()
-        val second = it.substringAfterLast(" ").toLong()
-        first to second
-    }.unzip()
+    fun part2(input: List<String>): Long = readToPairs(input).unzip()
         .let { (left, right) ->
             val occurrences = right.groupingBy { it }.eachCount()
             left.sumOf { it * (occurrences[it] ?: 0) }

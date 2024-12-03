@@ -1,37 +1,32 @@
 fun main() {
-
+    val mulRegex = """mul\((\d{1,3}),(\d{1,3})\)"""
+    val doRegex = """do\(\)"""
+    val dontRegex = """don't\(\)"""
 
     fun multiplyResult(it: MatchResult): Long {
-        check(it.groupValues.size == 3)
-        return it.groupValues[1].toLong() * it.groupValues[2].toLong()
+        val (first, second) = it.destructured
+        return first.toLong() * second.toLong()
     }
 
-    fun part1(input: List<String>): Long = input.flatMap {
-        """mul\((\d{1,3}),(\d{1,3})\)""".toRegex().findAll(it)
-    }.sumOf { multiplyResult(it) }
+    fun part1(input: String): Long = mulRegex.toRegex()
+        .findAll(input)
+        .sumOf { multiplyResult(it) }
 
-    fun part2(input: List<String>): Long {
+    fun part2(input: String): Long {
         var enabled = true
-        val regex = """mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)""".toRegex()
-        return input.flatMap { regex.findAll(it) }
-            .filter {
+        return """$mulRegex|$doRegex|$dontRegex""".toRegex()
+            .findAll(input)
+            .onEach {
                 when (it.value) {
-                    "do()" -> {
-                        enabled = true
-                        false
-                    }
-
-                    "don't()" -> {
-                        enabled = false
-                        false
-                    }
-
-                    else -> enabled
+                    "do()" -> enabled = true
+                    "don't()" -> enabled = false
                 }
-            }.sumOf { multiplyResult(it) }
+            }
+            .filter { enabled && it.value.startsWith("mul") }
+            .sumOf { multiplyResult(it) }
     }
 
-    val input = readInput("Day03")
+    val input = readInputSingleLine("Day03")
     part1(input).println()
     part2(input).println()
 }

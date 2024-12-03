@@ -1,7 +1,6 @@
 fun main() {
     val mulRegex = """mul\((\d{1,3}),(\d{1,3})\)"""
-    val doRegex = """do\(\)"""
-    val dontRegex = """don't\(\)"""
+    val doAndDontRegex = """do(n't)?\(\)"""
 
     fun multiplyResult(it: MatchResult): Long {
         val (first, second) = it.destructured
@@ -14,19 +13,20 @@ fun main() {
 
     fun part2(input: String): Long {
         var enabled = true
-        return """$mulRegex|$doRegex|$dontRegex""".toRegex()
+        var sum = 0L
+        """$mulRegex|$doAndDontRegex""".toRegex()
             .findAll(input)
-            .onEach {
-                when (it.value) {
-                    "do()" -> enabled = true
-                    "don't()" -> enabled = false
+            .forEach {
+                when {
+                    it.value == "do()" -> enabled = true
+                    it.value == "don't()" -> enabled = false
+                    enabled -> sum += multiplyResult(it)
                 }
             }
-            .filter { enabled && it.value.startsWith("mul") }
-            .sumOf { multiplyResult(it) }
+        return sum
     }
 
-    val input = readInputSingleLine("Day03")
+    val input = readInput("Day03").joinToString()
     part1(input).println()
     part2(input).println()
 }

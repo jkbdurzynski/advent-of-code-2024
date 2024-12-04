@@ -80,6 +80,12 @@ fun main() {
         }
     }
 
+    val xmasCornerLetters = arrayOf('M', 'S')
+    fun isMas(corner: Char, oppositeCorner: Char) =
+        corner != oppositeCorner &&
+                xmasCornerLetters.contains(corner) &&
+                xmasCornerLetters.contains(oppositeCorner)
+
 
     fun part1(input: List<String>): Int {
         val rightToLeft = input.map { it.reversed() }
@@ -97,32 +103,40 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        val xmasPatterns = arrayOf("MAS", "SAM")
-        return input.windowed(3).sumOf {
-            var count = 0
-            for (i in 0..input.first().length - 3) {
-                var y = i
-                val leftTopBottomRight = buildString {
-                    for (j in 0..2) {
-                        append(it[j][y++])
-                    }
-                }
-                y = i + 2
-                val rightTopBottomLeft = buildString {
-                    for (j in 0..2) {
-                        append(it[j][y--])
-                    }
-                }
+        var count = 0
+        for (i in 1..input.size - 2) {
+            for (j in 1..input.size - 2) {
+                if (input[i][j] != 'A') continue
 
-                if (xmasPatterns.contains(leftTopBottomRight) && xmasPatterns.contains(rightTopBottomLeft)) {
-                    count++
-                }
+                val topLeft = input[i - 1][j - 1]
+                val topRight = input[i - 1][j + 1]
+                val bottomLeft = input[i + 1][j - 1]
+                val bottomRight = input[i + 1][j + 1]
+                if (isMas(topLeft, bottomRight) && isMas(bottomLeft, topRight)) count++
             }
-            count
         }
+
+        return count
     }
+
+    fun part2V2(input: List<String>): Int = input.indices.drop(1).dropLast(1)
+        .sumOf { i ->
+            input[i].indices.drop(1).dropLast(1)
+                .count { j ->
+                    if (input[i][j] != 'A') {
+                        false
+                    } else {
+                        val topLeft = input[i - 1][j - 1]
+                        val topRight = input[i - 1][j + 1]
+                        val bottomLeft = input[i + 1][j - 1]
+                        val bottomRight = input[i + 1][j + 1]
+                        isMas(topLeft, bottomRight) && isMas(bottomLeft, topRight)
+                    }
+                }
+        }
 
     val input = readInput("Day04")
     part1(input).println()
     part2(input).println()
+    part2V2(input).println()
 }
